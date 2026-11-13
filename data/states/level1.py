@@ -280,16 +280,20 @@ class Level1(tools._State):
 
         koopa0 = enemies.Koopa()
 
+        spiny0 = enemies.Spiny()
+        spiny1 = enemies.Spiny(193)
+
         enemy_group1 = pg.sprite.Group(goomba0)
         enemy_group2 = pg.sprite.Group(goomba1)
         enemy_group3 = pg.sprite.Group(goomba2, goomba3)
-        enemy_group4 = pg.sprite.Group(goomba4, goomba5)
+        enemy_group4 = pg.sprite.Group(goomba4, goomba5, spiny1)
         enemy_group5 = pg.sprite.Group(goomba6, goomba7)
         enemy_group6 = pg.sprite.Group(koopa0)
         enemy_group7 = pg.sprite.Group(goomba8, goomba9)
         enemy_group8 = pg.sprite.Group(goomba10, goomba11)
         enemy_group9 = pg.sprite.Group(goomba12, goomba13)
         enemy_group10 = pg.sprite.Group(goomba14, goomba15)
+        enemy_group11 = pg.sprite.Group(spiny0)
 
         self.enemy_group_list = [enemy_group1,
                                  enemy_group2,
@@ -300,7 +304,8 @@ class Level1(tools._State):
                                  enemy_group7,
                                  enemy_group8,
                                  enemy_group9,
-                                 enemy_group10]
+                                 enemy_group10,
+                                 enemy_group11]
 
 
     def setup_mario(self):
@@ -323,15 +328,16 @@ class Level1(tools._State):
         check8 = checkpoint.Checkpoint(4950, '8')
         check9 = checkpoint.Checkpoint(5100, '9')
         check10 = checkpoint.Checkpoint(6800, '10')
-        check11 = checkpoint.Checkpoint(8504, '11', 5, 6)
-        check12 = checkpoint.Checkpoint(8775, '12')
-        check13 = checkpoint.Checkpoint(2740, 'secret_mushroom', 360, 40, 12)
+        check11 = checkpoint.Checkpoint(7000, '11')
+        check12 = checkpoint.Checkpoint(8504, '12', 5, 6)
+        check13 = checkpoint.Checkpoint(8775, '13')
+        check14 = checkpoint.Checkpoint(2740, 'secret_mushroom', 360, 40, 12)
 
         self.check_point_group = pg.sprite.Group(check1, check2, check3,
                                                  check4, check5, check6,
                                                  check7, check8, check9,
                                                  check10, check11, check12,
-                                                 check13)
+                                                 check13, check14)
 
 
     def setup_spritegroups(self):
@@ -431,13 +437,13 @@ class Level1(tools._State):
         if checkpoint:
             checkpoint.kill()
 
-            for i in range(1,11):
+            for i in range(1,12):
                 if checkpoint.name == str(i):
                     for index, enemy in enumerate(self.enemy_group_list[i -1]):
                         enemy.rect.x = self.viewport.right + (index * 60)
                     self.enemy_group.add(self.enemy_group_list[i-1])
 
-            if checkpoint.name == '11':
+            if checkpoint.name == '12':
                 self.mario.state = c.FLAGPOLE
                 self.mario.invincible = False
                 self.mario.flag_pole_right = checkpoint.rect.right
@@ -446,7 +452,7 @@ class Level1(tools._State):
                 self.flag.state = c.SLIDE_DOWN
                 self.create_flag_points()
 
-            elif checkpoint.name == '12':
+            elif checkpoint.name == '13':
                 self.state = c.IN_CASTLE
                 self.mario.kill()
                 self.mario.state = c.STAND    # исправлено с self.mario.state == c.STAND
@@ -704,7 +710,8 @@ class Level1(tools._State):
                 self.sprites_about_to_die_group.add(enemy)
                 enemy.start_death_jump(c.RIGHT)
             else:
-                self.adjust_mario_for_y_enemy_collisions(enemy)
+                if enemy.name != c.SPINY:
+                    self.adjust_mario_for_y_enemy_collisions(enemy)
 
         elif shell:
             self.adjust_mario_for_y_shell_collisions(shell)
@@ -874,6 +881,7 @@ class Level1(tools._State):
             self.moving_score_list.append(
                 score.Score(enemy.rect.centerx - self.viewport.x,
                             enemy.rect.y, 100))
+
             enemy.state = c.JUMPED_ON
             enemy.kill()
             if enemy.name == c.GOOMBA:
@@ -881,7 +889,6 @@ class Level1(tools._State):
                 self.sprites_about_to_die_group.add(enemy)
             elif enemy.name == c.KOOPA:
                 self.shell_group.add(enemy)
-
             self.mario.rect.bottom = enemy.rect.top
             self.mario.state = c.JUMP
             self.mario.y_vel = -7

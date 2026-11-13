@@ -191,3 +191,23 @@ class Koopa(Enemy):
             self.x_vel = 10
         elif self.direction == c.LEFT:
             self.x_vel = -10
+
+
+class Spiny(Enemy):
+    def __init__(self, y=c.GROUND_HEIGHT, x=0, direction=c.LEFT, name='spiny'):
+        Enemy.__init__(self)
+        self.setup_enemy(x, y, direction, name, self.setup_frames)
+
+    def setup_frames(self):
+        self.frames.append(
+            self.get_image(90,  154, 16, 16))
+        self.frames.append(
+            self.get_image(120, 154, 16, 16))
+        self.frames.append(
+            self.get_image(120, 154, 16, 16))
+        self.frames.append(pg.transform.flip(self.frames[2], False, True))
+
+
+    def jumped_on(self):
+
+        pass
